@@ -3,16 +3,58 @@ import streamlit as st
 # ------------------------------------------------
 # PAGE CONFIG
 # ------------------------------------------------
-
 st.set_page_config(
-    page_title="Philips Healthcare",
+    page_title="Philips MedSentinel AI",
     layout="wide"
 )
 
 # ------------------------------------------------
-# LOGIN SESSION
+# BACKGROUNDS
 # ------------------------------------------------
+login_bg = """
+<style>
+[data-testid="stAppViewContainer"]{
+background-image: url("https://images.unsplash.com/photo-1586773860418-d37222d8fce3");
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+}
+[data-testid="stHeader"]{background: rgba(0,0,0,0);}
+[data-testid="stSidebar"]{background: rgba(0,0,0,0);}
+</style>
+"""
 
+dashboard_bg = """
+<style>
+[data-testid="stAppViewContainer"]{
+background-image:
+linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+url("https://images.unsplash.com/photo-1579684385127-1ef15d508118");
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+}
+
+h1,h2,h3,h4,h5,h6,p,div,label{
+color:white !important;
+}
+
+.stButton>button{
+background-color:#00b4d8;
+color:white;
+border-radius:10px;
+border:none;
+padding:10px 20px;
+font-weight:bold;
+}
+</style>
+"""
+
+# ------------------------------------------------
+# SESSION STATE
+# ------------------------------------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
@@ -20,183 +62,130 @@ if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
 # ------------------------------------------------
-# LOGIN PAGE
+# LOGIN SCREEN
 # ------------------------------------------------
-
 if not st.session_state.logged_in:
 
+    st.markdown(login_bg, unsafe_allow_html=True)
+
+    # 🏥 BRANDING ON LOGIN PAGE
     st.markdown(
         """
-        <h1 style='text-align:center;color:#005EB8;'>
-        PHILIPS HEALTHCARE
-        </h1>
+        <div style='text-align:center;'>
+            <h1 style='color:white;'>🏥 Philips MedSentinel AI</h1>
+            <p style='color:white;'>Smart Healthcare Monitoring System</p>
+        </div>
         """,
         unsafe_allow_html=True
     )
-
-    st.markdown("## Patient Login")
 
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
     if st.button("Login"):
-
         if username == "Patient A" and password == "1234":
             st.session_state.logged_in = True
             st.rerun()
-
         else:
             st.error("Wrong username or password")
 
 # ------------------------------------------------
-# MAIN DASHBOARD
+# MAIN APP
 # ------------------------------------------------
-
 else:
 
-    # ---------------- TOP BAR ---------------- #
+    st.markdown(dashboard_bg, unsafe_allow_html=True)
 
-    col1, col2 = st.columns([8,2])
+    # 🏥 LOGO + HEADER (MAIN IMPROVEMENT)
+    col1, col2 = st.columns([1, 5])
 
     with col1:
-        st.markdown(
-            "<h1 style='color:#005EB8;'>PHILIPS</h1>",
-            unsafe_allow_html=True
+        st.image(
+            "https://upload.wikimedia.org/wikipedia/commons/5/5f/Philips_logo_new.svg",
+            width=90
         )
 
     with col2:
-        st.write("👤 Patient A")
+        st.title("Philips MedSentinel AI")
+        st.subheader("Smart Medical Monitoring & Interoperability System")
 
-    st.divider()
+    st.markdown("---")
 
-    # ---------------- BUTTON SECTION ---------------- #
+    # ---------------- SIDEBAR ----------------
+    st.sidebar.image(
+        "https://upload.wikimedia.org/wikipedia/commons/5/5f/Philips_logo_new.svg",
+        width=120
+    )
 
-    left, center, right = st.columns([2,5,2])
+    st.sidebar.title("MedSentinel AI Menu")
 
-    # LEFT SIDE
-    with left:
+    if st.sidebar.button("📊 Dashboard"):
+        st.session_state.page = "Dashboard"
 
-        st.markdown("## Menu")
+    if st.sidebar.button("🧠 AI Monitoring"):
+        st.session_state.page = "AI"
 
-        if st.button("🧠 AI Monitoring"):
-            st.session_state.page = "AI"
+    if st.sidebar.button("🛡️ Quality Guardian"):
+        st.session_state.page = "Quality"
 
-        if st.button("🛡️ Quality Guardian"):
-            st.session_state.page = "Quality"
+    if st.sidebar.button("🔗 Interoperability"):
+        st.session_state.page = "Interop"
 
-    # CENTER
-    with center:
-
-        st.markdown("## Patient Records")
-
-        st.container(border=True)
-
-        st.subheader("Patient A")
-
-        st.write("Patient ID: PH-2026-1001")
-        st.write("Age: 35")
-        st.write("Blood Group: O+")
-        st.write("Condition: Stable")
-
-        st.divider()
-
-        c1, c2, c3, c4 = st.columns(4)
-
-        with c1:
-            st.metric("Heart Rate", "78 BPM")
-
-        with c2:
-            st.metric("Blood Pressure", "120/80")
-
-        with c3:
-            st.metric("Oxygen", "98%")
-
-        with c4:
-            st.metric("Temperature", "36.6°C")
-
-        st.divider()
-
-        st.subheader("Recent Notes")
-
-        st.info(
-            "Regular checkup completed successfully."
-        )
-
-    # RIGHT SIDE
-    with right:
-
-        st.markdown("## System")
-
-        if st.button("🔗 Interoperability"):
-            st.session_state.page = "Interop"
-
-    st.divider()
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.rerun()
 
     # ------------------------------------------------
-    # DYNAMIC PAGE CONTENT
+    # PAGES
     # ------------------------------------------------
+    if st.session_state.page == "Dashboard":
 
-    if st.session_state.page == "AI":
+        st.header("Patient Dashboard")
 
-        st.header("🧠 AI Monitoring")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Patients Connected", "1,245")
+        with col2:
+            st.metric("Active Alerts", "12")
+        with col3:
+            st.metric("System Accuracy", "98%")
 
-        st.warning(
-            "AI detected slight blood pressure increase."
-        )
+        st.markdown("---")
 
-        st.info(
-            "Monitoring recommended for 24 hours."
-        )
+        st.subheader("Patient Records")
 
-        st.success(
-            "No critical emergency detected."
-        )
+        st.info("""
+        Patient Name: Patient A  
+        Patient ID: PH-2026-1001  
+        Age: 35  
+        Blood Group: O+  
+        Condition: Stable  
+        """)
+
+        st.success("Latest lab results uploaded successfully.")
+        st.warning("AI Alert: Slight increase in blood pressure.")
+
+    elif st.session_state.page == "AI":
+
+        st.header("AI Monitoring System")
+
+        st.warning("AI detected slight blood pressure increase.")
+        st.info("Recommended monitoring: 24 hours.")
+        st.success("No emergency condition detected.")
 
     elif st.session_state.page == "Quality":
 
-        st.header("🛡️ Quality Guardian")
+        st.header("AI Quality Guardian")
 
-        st.write("Device Safety Status: SAFE")
-        st.write("Complaint Risk Score: LOW")
-        st.write("Maintenance Status: COMPLETED")
-
-        st.success(
-            "All medical devices functioning normally."
-        )
+        st.success("All medical devices functioning normally.")
+        st.info("No product recall risk detected.")
 
     elif st.session_state.page == "Interop":
 
-        st.header("🔗 Interoperability System")
+        st.header("Interoperability System")
 
-        st.write("Connected Systems:")
-
-        st.write("✅ Electronic Health Records")
-        st.write("✅ MRI Scanner")
-        st.write("✅ Laboratory System")
-        st.write("✅ Insurance Database")
-
-        st.success(
-            "All hospital systems connected successfully."
-        )
-
-    else:
-
-        st.header("📊 Dashboard")
-
-        a1, a2 = st.columns(2)
-
-        with a1:
-            st.error(
-                "AI Alert: Slight increase in blood pressure."
-            )
-
-        with a2:
-            st.success(
-                "Latest lab results uploaded successfully."
-            )
-
-    st.divider()
-
-    if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.rerun()
+        st.success("Electronic Health Records")
+        st.success("MRI Scanner")
+        st.success("Laboratory System")
+        st.success("Insurance Database")
+        st.success("Patient Monitoring Devices")
